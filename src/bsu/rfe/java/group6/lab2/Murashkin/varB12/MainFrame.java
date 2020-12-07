@@ -15,8 +15,10 @@ public class MainFrame  extends JFrame {
     private JTextField textFieldY;
     private JTextField textFieldZ;
     private JTextField textFieldResult;
-    private JTextField memoryTextField;
-    double sum = 0.0;
+    private JTextField memoryTextField1;
+    private JTextField memoryTextField2;
+    private JTextField memoryTextField3;
+
 
     private ButtonGroup radioButtons = new ButtonGroup();
     private ButtonGroup radioMemoryButtons = new ButtonGroup();
@@ -55,9 +57,9 @@ public class MainFrame  extends JFrame {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event)	{
                 MainFrame.this.memoryId = memoryId;
-                if (memoryId == 1)	memoryTextField.setText(mem1.toString());
-                if (memoryId == 2)	memoryTextField.setText(mem2.toString());
-                if (memoryId == 3)	memoryTextField.setText(mem3.toString());
+                if (memoryId == 1)	memoryTextField1.setText(mem1.toString());
+                if (memoryId == 2)	memoryTextField2.setText(mem2.toString());
+                if (memoryId == 3)	memoryTextField3.setText(mem3.toString());
             }
         });
         radioMemoryButtons.add(button);
@@ -91,10 +93,11 @@ public class MainFrame  extends JFrame {
         hboxVariables.setBorder(
                 BorderFactory.createLineBorder(Color.RED));
 
-        hboxVariables.add(Box.createHorizontalGlue());
+
         hboxVariables.add(labelForX);
         hboxVariables.add(Box.createHorizontalStrut(10));
         hboxVariables.add(textFieldX);
+        hboxVariables.add(Box.createHorizontalGlue());
 
         hboxVariables.add(Box.createHorizontalStrut(100));
         hboxVariables.add(labelForY);
@@ -103,13 +106,12 @@ public class MainFrame  extends JFrame {
         hboxVariables.add(Box.createHorizontalGlue());
 
         hboxVariables.add(Box.createHorizontalStrut(100));
-        hboxVariables.add(Box.createHorizontalGlue());
         hboxVariables.add(labelForZ);
         hboxVariables.add(Box.createHorizontalStrut(10));
         hboxVariables.add(textFieldZ);
 
         JLabel labelForResult = new JLabel("Результат: ");
-        textFieldResult = new JTextField("0", 10);
+        textFieldResult = new JTextField("0", 20);
         textFieldResult.setMaximumSize(textFieldResult.getPreferredSize());
         Box hboxResult = Box.createHorizontalBox();
         hboxResult.add(Box.createHorizontalGlue());
@@ -150,6 +152,7 @@ public class MainFrame  extends JFrame {
         addMemoryRadioButton("Память 1",1);
         addMemoryRadioButton("Память 2",2);
         addMemoryRadioButton("Память 3",3);
+
         radioMemoryButtons.setSelected(radioMemoryButtons.getElements().nextElement().getModel(), true);
         hBoxMemoryType.add(Box.createHorizontalGlue());
         JButton buttonMPlus = new JButton("M+");
@@ -157,38 +160,47 @@ public class MainFrame  extends JFrame {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 try {
-                    if (memoryId == 1) 	{
-                        Double result = Double.parseDouble(textFieldX.getText());
-                        mem1 += result;
-                        textFieldX.setText(String.valueOf(mem1));}
-                    if (memoryId == 2)	{
-                        Double result = Double.parseDouble(textFieldY.getText());
-                        mem2 += result;
-                        textFieldY.setText(String.valueOf(mem2));}
-                    if (memoryId == 3)	{
-                        Double result = Double.parseDouble(textFieldZ.getText());
-                        mem3 += result;
-                        textFieldZ.setText(String.valueOf(mem3));}
+                    Double x = Double.parseDouble(textFieldX.getText());
+                    Double y = Double.parseDouble(textFieldY.getText());
+                    Double z = Double.parseDouble(textFieldZ.getText());
+                    mem1 = Double.parseDouble(memoryTextField1.getText());
+                    mem2 = Double.parseDouble(memoryTextField2.getText());
+                    mem3 = Double.parseDouble(memoryTextField3.getText());
+                    Double result;
+                    if (memoryId == 1) {
+                        if (formulaId == 1) result = mem1 + calculate1(x, y, z);
+                        else result = mem1 + calculate2(x, y, z);
+                        memoryTextField1.setText(String.valueOf(result));
+                    }
+                    if (memoryId == 2) {
+                        if (formulaId == 1) result = mem2 + calculate1(x, y, z);
+                        else result = mem2 + calculate2(x, y, z);
+                        memoryTextField2.setText(result.toString());
+                    }
+                    if (memoryId == 3) {
+                        if (formulaId == 1) result = mem3 + calculate1(x, y, z);
+                        else result = mem3 + calculate2(x, y, z);
+                        memoryTextField3.setText(result.toString());
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Ошибка в формате числа с плавающей точкой",
+                            "Ошибочный формат числа", JOptionPane.WARNING_MESSAGE);
                 }
-                catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Ошибка в формате числа с плавающей точкой", "Ошибочный формат числа", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
+            }});
 
         JButton buttonMC = new JButton("MC");
         buttonMC.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 if (memoryId == 1)	{
-                    mem1 = (double) 0;
-                    textFieldX.setText(String.valueOf(mem1));}
+                    mem1 = 0.0 ;
+                    memoryTextField1.setText(String.valueOf(0));}
                 if (memoryId == 2)	{
-                    mem2 = (double) 0;
-                    textFieldY.setText(String.valueOf(mem2));}
+                    mem2 = 0.0;
+                    memoryTextField2.setText(String.valueOf(0));}
                 if (memoryId == 3)	{
-                    mem3 = (double) 0;
-                    textFieldZ.setText(String.valueOf(mem3));}
+                    mem3 = 0.0;
+                    memoryTextField3.setText(String.valueOf(0));}
 
             }
         });
@@ -209,6 +221,31 @@ public class MainFrame  extends JFrame {
         hboxButtons.setBorder(BorderFactory.createLineBorder(Color.GREEN));
 
 
+        JLabel labelForMemory1 = new JLabel("Память1: ");
+        memoryTextField1 = new JTextField("0", 20);
+        memoryTextField1.setMaximumSize(memoryTextField1.getPreferredSize());
+        JLabel labelForMemory2 = new JLabel("Память2: ");
+        memoryTextField2 = new JTextField("0", 20);
+        memoryTextField2.setMaximumSize(memoryTextField2.getPreferredSize());
+        JLabel labelForMemory3 = new JLabel("Память3: ");
+        memoryTextField3 = new JTextField("0", 20);
+        memoryTextField3.setMaximumSize(memoryTextField3.getPreferredSize());
+
+        Box hboxMemory = Box.createHorizontalBox();
+        hboxMemory.add(Box.createHorizontalGlue());
+        hboxMemory.add(labelForMemory1);
+        hboxMemory.add(Box.createHorizontalStrut(10));
+        hboxMemory.add(memoryTextField1);
+        hboxMemory.add(Box.createHorizontalGlue());
+        hboxMemory.add(labelForMemory2);
+        hboxMemory.add(Box.createHorizontalStrut(10));
+        hboxMemory.add(memoryTextField2);
+        hboxMemory.add(Box.createHorizontalGlue());
+        hboxMemory.add(labelForMemory3);
+        hboxMemory.add(Box.createHorizontalStrut(10));
+        hboxMemory.add(memoryTextField3);
+        hboxMemory.add(Box.createHorizontalGlue());
+
         Box contentBox = Box.createVerticalBox();
         contentBox.add(hboxFormulaType);
         contentBox.add(hboxVariables);
@@ -216,6 +253,7 @@ public class MainFrame  extends JFrame {
         contentBox.add(hboxmemoryResult);
         contentBox.add(hboxButtons);
         contentBox.add(hBoxMemoryType);
+        contentBox.add(hboxMemory);
         contentBox.add(Box.createVerticalGlue());
         getContentPane().add(contentBox, BorderLayout.CENTER);
     }
